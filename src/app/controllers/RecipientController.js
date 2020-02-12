@@ -8,7 +8,7 @@ class RecipientController {
       zipcode: Yup.string()
         .length(9)
         .required(),
-      street: Yup.string().required(),
+      adress: Yup.string().required(),
       number: Yup.number().required(),
       city: Yup.string().required(),
       state: Yup.string().required(),
@@ -42,7 +42,7 @@ class RecipientController {
     const schema = Yup.object().shape({
       name: Yup.string(),
       zipcode: Yup.string().length(9),
-      street: Yup.string(),
+      adress: Yup.string(),
       number: Yup.number(),
       city: Yup.string(),
       state: Yup.string(),
@@ -60,7 +60,6 @@ class RecipientController {
     }
 
     const {
-      id,
       name,
       street,
       number,
@@ -70,7 +69,6 @@ class RecipientController {
     } = await recipient.update(req.body);
 
     return res.json({
-      id,
       name,
       street,
       number,
