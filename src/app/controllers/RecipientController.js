@@ -20,7 +20,6 @@ class RecipientController {
     }
 
     const {
-      id,
       name,
       street,
       number,
@@ -30,7 +29,6 @@ class RecipientController {
     } = await Recipient.create(req.body);
 
     return res.json({
-      id,
       name,
       street,
       number,
