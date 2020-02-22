@@ -88,7 +88,12 @@ class DeliveryManController {
     const { id } = req.params;
 
     if (id) {
-      const deliveryman = await DeliveryMan.findOne({ where: { id } });
+      const deliveryman = await DeliveryMan.findOne({
+        where: { id },
+        include: [
+          { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
+        ],
+      });
 
       if (!deliveryman) {
         return res.status(400).json({ error: 'Deliveryman not found' });
@@ -97,7 +102,11 @@ class DeliveryManController {
       return res.json(deliveryman);
     }
 
-    const deliverymans = await DeliveryMan.findAll();
+    const deliverymans = await DeliveryMan.findAll({
+      include: [
+        { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
+      ],
+    });
 
     if (!deliverymans) {
       return res.status(400).json({ error: 'Deliverymans not founded' });
