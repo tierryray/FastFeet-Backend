@@ -2,6 +2,27 @@ import * as Yup from 'yup';
 import User from '../models/User';
 
 class UserController {
+  async index(req, res) {
+    const { id } = req.params;
+
+    if (id) {
+      const user = await User.findByPk(id, {
+        attributes: ['id', 'name', 'email'],
+      });
+
+      if (!user) {
+        return res.status(400).json({ error: 'User not found!' });
+      }
+
+      return res.json(user);
+    }
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'email'],
+    });
+
+    return res.json(users);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -73,6 +94,24 @@ class UserController {
       name,
       email,
     });
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found!' });
+    }
+
+    await user.destroy();
+
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'email'],
+    });
+
+    return res.json(users);
   }
 }
 

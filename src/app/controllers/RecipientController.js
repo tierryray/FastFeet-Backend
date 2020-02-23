@@ -2,6 +2,28 @@ import * as Yup from 'yup';
 import Recipient from '../models/Recipient';
 
 class RecipientController {
+  async index(req, res) {
+    const { id } = req.params;
+
+    if (id) {
+      const recipient = await Recipient.findByPk(id, {
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      });
+
+      if (!recipient) {
+        return res.status(400).json({ error: 'Recipient not found!' });
+      }
+
+      return res.json(recipient);
+    }
+
+    const recipients = await Recipient.findAll({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
+
+    return res.json(recipients);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -76,6 +98,26 @@ class RecipientController {
       state,
       zipcode,
     });
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const recipient = await Recipient.findByPk(id, {
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
+
+    if (!recipient) {
+      return res.status(400).json({ error: 'Recipient not found!' });
+    }
+
+    await recipient.destroy();
+
+    const recipients = await Recipient.findAll({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
+
+    return res.json(recipients);
   }
 }
 

@@ -18,11 +18,15 @@ routes.post('/login', SessionController.store);
 
 routes.use(authMiddleware);
 
+routes.get('/users/:id?', UserController.index);
 routes.post('/users', UserController.store);
 routes.put('/user', UserController.update);
+routes.delete('/users/:id', UserController.delete);
 
+routes.get('/recipients/:id?', RecipientController.index);
 routes.post('/recipients', RecipientController.store);
 routes.put('/recipients/:id', RecipientController.update);
+routes.delete('/recipients/:id', RecipientController.delete);
 
 routes.post('/files', upload.single('file'), FileController.store);
 
