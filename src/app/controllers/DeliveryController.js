@@ -1,11 +1,16 @@
 import * as Yup from 'yup';
+
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import DeliveryMan from '../models/DeliveryMan';
 import File from '../models/File';
 
+import NewDeliveryMail from '../jobs/NewDeliveryMail';
+import Queue from '../../lib/Queue';
+
 class DeliveryController {
   async index(req, res) {
+    const { page } = req.query;
     const { id } = req.params;
 
     if (id) {
@@ -64,6 +69,8 @@ class DeliveryController {
           'path',
         ],
       },
+      limit: 20,
+      offset: (page - 1) * 20,
       include: [
         {
           model: File,
@@ -135,15 +142,20 @@ class DeliveryController {
     }
 
     try {
-      const { id, product } = await Delivery.create(req.body);
+      const delivery = await Delivery.create(req.body);
+
+      await Queue.add(NewDeliveryMail.key, {
+        delivery,
+        deliveryman,
+      });
 
       return res.json({
-        id,
-        product,
+        id: delivery.id,
+        product: delivery.product,
         recipient,
         deliveryman,
       });
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({ error: 'Internal Server error' });
     }
   }
