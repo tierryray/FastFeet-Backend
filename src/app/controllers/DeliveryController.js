@@ -57,7 +57,7 @@ class DeliveryController {
       return res.json(delivery);
     }
 
-    const deliveries = await Delivery.finddAll({
+    const deliveries = await Delivery.findAll({
       attributes: {
         exclude: [
           'canceled_at',
