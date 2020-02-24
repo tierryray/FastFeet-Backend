@@ -17,7 +17,6 @@ class DeliveryController {
       const delivery = await Delivery.findByPk(id, {
         attributes: {
           exclude: [
-            'canceled_at',
             'createdAt',
             'updatedAt',
             'signature_id',
@@ -60,7 +59,6 @@ class DeliveryController {
     const deliveries = await Delivery.findAll({
       attributes: {
         exclude: [
-          'canceled_at',
           'createdAt',
           'updatedAt',
           'signature_id',
@@ -71,6 +69,7 @@ class DeliveryController {
       },
       limit: 20,
       offset: (page - 1) * 20,
+      order: [['id', 'DESC']],
       include: [
         {
           model: File,
@@ -141,23 +140,19 @@ class DeliveryController {
       return res.status(400).json({ error: 'Deliveryman not found!' });
     }
 
-    try {
-      const delivery = await Delivery.create(req.body);
+    const delivery = await Delivery.create(req.body);
 
-      await Queue.add(NewDeliveryMail.key, {
-        delivery,
-        deliveryman,
-      });
+    await Queue.add(NewDeliveryMail.key, {
+      delivery,
+      deliveryman,
+    });
 
-      return res.json({
-        id: delivery.id,
-        product: delivery.product,
-        recipient,
-        deliveryman,
-      });
-    } catch (err) {
-      return res.status(500).json({ error: 'Internal Server error' });
-    }
+    return res.json({
+      id: delivery.id,
+      product: delivery.product,
+      recipient,
+      deliveryman,
+    });
   }
 
   async update(req, res) {
@@ -237,6 +232,7 @@ class DeliveryController {
           'path',
         ],
       },
+      order: [['id', 'DESC']],
       include: [
         {
           model: File,

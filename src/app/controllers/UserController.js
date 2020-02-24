@@ -18,6 +18,7 @@ class UserController {
     }
     const users = await User.findAll({
       attributes: ['id', 'name', 'email'],
+      order: [['id', 'DESC']],
     });
 
     return res.json(users);

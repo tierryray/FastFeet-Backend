@@ -19,6 +19,7 @@ class RecipientController {
 
     const recipients = await Recipient.findAll({
       attributes: { exclude: ['createdAt', 'updatedAt'] },
+      order: [['id', 'DESC']],
     });
 
     return res.json(recipients);

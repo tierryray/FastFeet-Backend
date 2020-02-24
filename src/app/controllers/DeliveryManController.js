@@ -106,6 +106,7 @@ class DeliveryManController {
       include: [
         { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
       ],
+      order: [['id', 'DESC']],
     });
 
     if (!deliverymans) {
@@ -128,6 +129,7 @@ class DeliveryManController {
 
     const deliverymans = await DeliveryMan.findAll({
       attributes: ['id', 'name', 'email', 'avatar_id'],
+      order: [['id', 'DESC']],
     });
 
     return res.json(deliverymans);
