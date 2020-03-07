@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import DeliveryMan from '../models/DeliveryMan';
 import File from '../models/File';
 
@@ -86,6 +87,7 @@ class DeliveryManController {
 
   async index(req, res) {
     const { id } = req.params;
+    const { q } = req.query;
 
     if (id) {
       const deliveryman = await DeliveryMan.findOne({
@@ -100,6 +102,22 @@ class DeliveryManController {
       }
 
       return res.json(deliveryman);
+    }
+
+    if (q) {
+      const deliverymans = await DeliveryMan.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${q}%`,
+          },
+        },
+        include: [
+          { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
+        ],
+        order: [['id', 'DESC']],
+      });
+
+      return res.json(deliverymans);
     }
 
     const deliverymans = await DeliveryMan.findAll({

@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
@@ -10,7 +11,7 @@ import Queue from '../../lib/Queue';
 
 class DeliveryController {
   async index(req, res) {
-    const { page } = req.query;
+    const { page, q } = req.query;
     const { id } = req.params;
 
     if (id) {
@@ -54,6 +55,50 @@ class DeliveryController {
       }
 
       return res.json(delivery);
+    }
+
+    if (q) {
+      const deliveries = await Delivery.findAll({
+        where: {
+          product: {
+            [Op.like]: `%${q}%`,
+          },
+        },
+        attributes: {
+          exclude: [
+            'createdAt',
+            'updatedAt',
+            'signature_id',
+            'recipient_id',
+            'deliveryman_id',
+            'path',
+          ],
+        },
+        include: [
+          {
+            model: File,
+            as: 'signature',
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+          },
+          {
+            model: Recipient,
+            as: 'recipient',
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+          },
+          {
+            model: DeliveryMan,
+            as: 'deliveryman',
+            attributes: { exclude: ['createdAt', 'updatedAt', 'avatar_id'] },
+            include: {
+              model: File,
+              as: 'avatar',
+              attributes: ['name', 'path'],
+            },
+          },
+        ],
+      });
+
+      return res.json(deliveries);
     }
 
     const deliveries = await Delivery.findAll({
